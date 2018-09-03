@@ -120,7 +120,7 @@ function populateTable(matrix)
 		html += "<td id=\"tdres_"+ j + "_" + i +"\">"+ count1col + "</td>";
 	}
 	
-	html += "<td id=\"checkIcon\"><i class=\"fas fa-times-circle\"></i></td></tr>";
+	html += "<td id=\"tdres_checkIcon\"><i class=\"fas fa-times-circle\"></i></td></tr>";
 	
 	$("#boardtable").append(html);
 }
@@ -286,14 +286,14 @@ function checkIsSolved(tdID)
 	{ 
 		res = true;
 		
-		//$(document.getElementById("checkIcon").classList.remove('fas fa-times-circle'));
-		//$(document.getElementById("checkIcon").classList.add('fas fa-check-circle'));
-		$(document.getElementById("checkIcon")).html("<i class=\"fas fa-check-circle\"></i>");
+		//$(document.getElementById("tdres_checkIcon").classList.remove('fas fa-times-circle'));
+		//$(document.getElementById("tdres_checkIcon").classList.add('fas fa-check-circle'));
+		$(document.getElementById("tdres_checkIcon")).html("<i class=\"fas fa-check-circle\"></i>");
 			
 	}
 	else
 	{
-		$(document.getElementById("checkIcon")).html("<i class=\"fas fa-times-circle\"></i>");
+		$(document.getElementById("tdres_checkIcon")).html("<i class=\"fas fa-times-circle\"></i>");
 	}
 	
 	return res;
