@@ -134,16 +134,21 @@ function changeCellOnClick(event)
 	var txtToReplace = $(document.getElementById(clickedCellID)).html();
 	//console.log("Replacing \"" + txtToReplace +"\"");
 	
-	if(txtToReplace.localeCompare(unknownText)==0)
+	if(!clickedCellID.startsWith("tdres"))
 	{
-		//console.log("Replace!");
-		$(document.getElementById(clickedCellID)).html(markText);
+		if(txtToReplace.localeCompare(unknownText)==0)
+		{
+			//console.log("Replace!");
+			$(document.getElementById(clickedCellID)).html(markText);
+		}
+		else
+		{
+			//console.log("Replaced back!");
+			$(document.getElementById(clickedCellID)).html(unknownText);
+		}
 	}
-	else
-	{
-		//console.log("Replaced back!");
-		$(document.getElementById(clickedCellID)).html(unknownText);
-	}
+	
+	
 	
 	return clickedCellID;
 }
