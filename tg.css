@@ -1,0 +1,31 @@
+table
+{
+	border: solid 1px;
+	border-collapse: collapse;
+	table-layout: fixed;
+	text-align: center;
+}
+
+tr
+{
+	border-bottom: solid 1px;
+	
+}
+
+td
+{
+	border-left: solid 1px;	
+	
+	width: 40px;
+	height: 40px;
+}
+
+.correct
+{
+	background-color: #00cc44;
+}
+
+.uncorrect
+{
+	background-color: #ff6666;
+}

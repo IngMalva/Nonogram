@@ -1,0 +1,293 @@
+<html>
+<head>
+<script src="scripts/jquery-3.3.1.js"></script>
+<script src="scripts/tg.js"></script>
+<script src="fontawesome-free-5.3.1-web/js/fontawesome.js"></script>
+
+<link href="tg.css" rel="stylesheet" type="text/css" />
+<link href="fontawesome-free-5.3.1-web/css/all.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<table id="boardtable">
+
+</table>
+
+<script>
+//settings
+var boardSize = 6;        //the board size
+var global_chance = 0.4;  //the percentage under which you have a "black" cell
+var unknownText = "";     //the text shown in the cells if not marked / not yet clicked
+var markText = "X";       //the text shown in the cells if marked
+
+var board = new Array(boardSize);
+
+
+$( document ).ready(function() {
+    console.log( "building the matrix..." );
+	
+	buildMatrix(boardSize);
+	
+	populateTable(board);
+	
+	//onclick cambia ? con una x
+	$("#boardtable:has(td)").click(function(e) {
+		
+		var clickedID = changeCellOnClick(e);
+		
+		var isSolved = checkIsSolved(clickedID);
+		
+		if(isSolved)
+		{
+			//alert("Risolto!");
+		}
+		
+	});
+	
+});
+
+function buildMatrix(size)
+{
+	var x = 0;
+	var chance = global_chance; 
+	var row = new Array(boardSize);
+	board = new Array(boardSize);
+	
+	for(var i=0; i<boardSize; i++)
+	{
+		row = new Array(boardSize);
+		
+		for(var j=0; j<boardSize; j++)
+		{
+			x = Math.random(); 
+			//console.log("x = " + x);			
+			
+			if(x <= chance)
+			{
+				row[j] = 1;
+			}
+			else
+			{
+				row[j] = 0;
+			}
+			//console.log("row["+j+"] = " + row[j]);
+					
+		}
+		console.log("row: " + row);
+		board[i] = row;
+		//console.log("board["+ i +"]: " + board[i]);
+		
+	}
+}
+
+function populateTable(matrix)
+{
+	$("#boardtable").empty();
+	var html ="";
+	var count1row = 0;
+	
+	for(var i=0; i<boardSize; i++)
+	{
+		html += "<tr>";
+		count1row = 0;
+		
+		for(var j=0; j<boardSize; j++)
+		{
+			html += "<td id=\"td_"+ i + "_" + j +"\">" + unknownText + "</td>"; //<td id="td_1_5"="">?</td> //esempio
+			if(matrix[i][j] == 1)
+			{
+				count1row++;
+			}
+		}
+		html += "<td id=\"tdres_"+ i + "_" + j +"\">"+ count1row +"</td>";		
+		html += "</tr>";
+	}
+	
+	html += "<tr>";
+	var count1col = 0;
+	
+	for(var i=0; i<boardSize; i++)	
+	{
+		count1col = 0;
+		
+		for(var j=0; j<boardSize; j++)
+		{
+			if(matrix[j][i] == 1)
+			{
+				count1col++;
+			}
+		}
+		html += "<td id=\"tdres_"+ j + "_" + i +"\">"+ count1col + "</td>";
+	}
+	
+	html += "<td id=\"checkIcon\"><i class=\"fas fa-times-circle\"></i></td></tr>";
+	
+	$("#boardtable").append(html);
+}
+
+function changeCellOnClick(event)
+{
+	var clickedCellID= $(event.target).closest("td").attr("id");
+ 
+	//console.log("td id: " + clickedCellID);
+	
+	var txtToReplace = $(document.getElementById(clickedCellID)).html();
+	//console.log("Replacing \"" + txtToReplace +"\"");
+	
+	if(txtToReplace.localeCompare(unknownText)==0)
+	{
+		//console.log("Replace!");
+		$(document.getElementById(clickedCellID)).html(markText);
+	}
+	else
+	{
+		//console.log("Replaced back!");
+		$(document.getElementById(clickedCellID)).html(unknownText);
+	}
+	
+	return clickedCellID;
+}
+
+function checkIsSolved(tdID)
+{
+	var tdIDarr = tdID.split("_");
+	//console.log(tdIDarr);
+	
+	var res = false;
+	var countedRight = 0;
+	var totalCount = 0;
+	
+	//Se la riga è ok, cambia lo sfondo del totale sulla riga appena cliccata	
+	var rowTotalCount = 0;
+	var rowCountedRight = 0;
+	var rowTotalMarked = 0;
+	
+	for(var i=0; i<boardSize; i++)
+	{		
+		var boardCell = board[tdIDarr[1]][i];
+		
+		//somma totale degli 1 per la riga
+		if( board[tdIDarr[1]][i] == 1)
+		{		
+			rowTotalCount++;
+			
+			//somma totale dei segni messi dall'utente nel posto giusto
+			if($(document.getElementById("td_" + tdIDarr[1] + "_" + i)).html().localeCompare(markText) == 0)
+			{
+				rowCountedRight++;
+			}					
+		}	
+		
+		if($(document.getElementById("td_" + tdIDarr[1] + "_" + i)).html().localeCompare(markText) == 0)
+		{
+			rowTotalMarked++;
+		}			
+	}
+	
+	if((rowCountedRight == rowTotalCount) && (rowCountedRight == rowTotalMarked))
+	{
+		//console.log("tdres_" + tdIDarr[1] + "_" + boardSize);
+		console.log("row correct!");
+		$(document.getElementById("tdres_" + tdIDarr[1] + "_" + boardSize).classList.remove('uncorrect'));
+		$(document.getElementById("tdres_" + tdIDarr[1] + "_" + boardSize).classList.add('correct'));
+	}
+	else
+	{
+		$(document.getElementById("tdres_" + tdIDarr[1] + "_" + boardSize).classList.remove('correct'));
+		$(document.getElementById("tdres_" + tdIDarr[1] + "_" + boardSize).classList.add('uncorrect'));
+	}
+	
+	
+	//Se la colonna è ok, cambia lo sfondo del totale sulla colonna appena cliccata	
+	var colTotalCount = 0;
+	var colCountedRight = 0;
+	var colTotalMarked = 0;
+	var totalMarks = 0;
+	
+	for(var i=0; i<boardSize; i++)
+	{		
+		var boardCell = board[i][tdIDarr[2]];
+		
+		//somma totale degli 1 per la riga
+		if( board[i][tdIDarr[2]] == 1)
+		{		
+			colTotalCount++;
+			
+			if($(document.getElementById("td_" + i + "_" + tdIDarr[2])).html().localeCompare(markText) == 0)
+			{
+				colCountedRight++;
+			}					
+		}
+
+		if($(document.getElementById("td_" + i + "_" + tdIDarr[2])).html().localeCompare(markText) == 0)
+		{
+			colTotalMarked++;
+		}		
+	}
+		
+	
+	if((colCountedRight == colTotalCount) && (colCountedRight == colTotalMarked))
+	{
+		//console.log("tdres_" + boardSize + "_" + tdIDarr[2]);
+		console.log("column correct!");
+		$(document.getElementById("tdres_" + boardSize + "_" + tdIDarr[2]).classList.remove('uncorrect'));
+		$(document.getElementById("tdres_" + boardSize + "_" + tdIDarr[2]).classList.add('correct'));
+	}
+	else
+	{
+		$(document.getElementById("tdres_" + boardSize + "_" + tdIDarr[2]).classList.remove('correct'));
+		$(document.getElementById("tdres_" + boardSize + "_" + tdIDarr[2]).classList.add('uncorrect'));
+	}
+	
+	
+	//conto totale, per vedere se ho completato o meno il puzzle
+	for(var i=0; i<boardSize; i++)
+	{
+		for(var j=0; j<boardSize; j++)
+		{
+			tdNewID = "td_" + i + "_" + j;
+			
+			if(board[i][j] == 1)
+			{
+				totalCount++;
+			}
+			
+			if($(document.getElementById(tdNewID)).html().localeCompare(markText) == 0)
+			{				
+				//se c'è una X, controllo che nella matrice corrispondente ci sia un 1.
+				//se c'è uno 0 invece devo interrompere
+				if(board[i][j] == 1)
+				{
+					countedRight++;							
+				}
+				
+				//conto i marchi totali
+				totalMarks++;
+			}
+			
+			//console.log("Cell is: " + $(document.getElementById(tdNewID)).html() + " Matrix is: " + board[i][j]);			
+		}
+	}
+	
+	console.log("Found "+ countedRight + " on " + totalCount);
+	
+	if((countedRight == totalCount)&&(totalMarks == totalCount))
+	{ 
+		res = true;
+		
+		//$(document.getElementById("checkIcon").classList.remove('fas fa-times-circle'));
+		//$(document.getElementById("checkIcon").classList.add('fas fa-check-circle'));
+		$(document.getElementById("checkIcon")).html("<i class=\"fas fa-check-circle\"></i>");
+			
+	}
+	else
+	{
+		$(document.getElementById("checkIcon")).html("<i class=\"fas fa-times-circle\"></i>");
+	}
+	
+	return res;
+}
+
+</script>
+
+</body>
+</html>
